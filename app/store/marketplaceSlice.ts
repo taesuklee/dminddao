@@ -1,15 +1,13 @@
 'use client'
 
-import { Marketplace } from '../../typechain-types/contracts/Marketplace'
 import { createSlice } from '@reduxjs/toolkit'
-
 export interface MarketPlaceState {
   address: string | null
-  abi: any
+  abi: string | null
 }
 
 const initialState: MarketPlaceState = {
-  address: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
+  address: null,
   abi: null,
 }
 

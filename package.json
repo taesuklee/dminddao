@@ -13,6 +13,8 @@
     "hardhat": "^2.14.1"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.0"
+    "@openzeppelin/contracts": "^4.9.0",
+    "axios": "^1.4.0",
+    "ipfs-http-client": "^60.0.1"
   }
 }
