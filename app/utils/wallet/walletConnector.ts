@@ -2,8 +2,6 @@ import { ethers, Signer } from 'ethers'
 import Web3Modal from 'web3modal'
 import { Provider } from '@ethersproject/abstract-provider'
 import { marketplaceAddress, marketplaceABI } from './constants'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { setAddress } from '@/store/marketplaceSlice'
 
 const fetchContract = (signerOrProvider: Signer | Provider) =>
   new ethers.Contract(marketplaceAddress, marketplaceABI, signerOrProvider)
