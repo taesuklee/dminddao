@@ -1,4 +1,4 @@
-import marketplace from './Marketplace.json'
+import marketPlace from './Marketplace.json'
 
-export const marketplaceAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
-export const marketplaceABI = marketplace.abi
+export const marketPlaceAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+export const marketPlaceABI = marketPlace.abi

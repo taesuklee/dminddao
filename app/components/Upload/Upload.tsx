@@ -14,10 +14,10 @@ import { createNode, uploadData } from '@/utils/ipfs/ipfs'
 import { MemoryBlockstore } from 'blockstore-core'
 
 const Upload = () => {
-  const [fileUrl, setFileUrl] = useState(null)
+  const [fileUrl, setFileUrl] = useState('')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [price, setPrice] = useState(0)
+  const [price, setPrice] = useState('')
 
   useEffect(() => {
     const init = async () => {
@@ -27,12 +27,15 @@ const Upload = () => {
     init()
   }, [fileUrl])
 
-  const onDrop = useCallback(async (acceptedFile: any[]) => {
-    console.log('AF', acceptedFile)
+  const onDrop = useCallback(
+    async (acceptedFile: any[]) => {
+      console.log('AF', acceptedFile)
 
-    await uploadData('TEST testtest')
-    setFileUrl(acceptedFile[0])
-  }, [])
+      const url = await uploadData(acceptedFile[0])
+      setFileUrl(url)
+    },
+    [fileUrl]
+  )
 
   //TODO: accept only specific audio file. https://react-dropzone.js.org/#section-accepting-specific-file-types
   const { getRootProps, getInputProps } = useDropzone({
@@ -48,29 +51,26 @@ const Upload = () => {
           <FiUpload />
           <input {...getInputProps()} />
         </button>
-        {fileUrl && (
-          <div>
-            <div>
-              <label>NFT name: </label>
-              <input type="text" onChange={(e) => setName(e.target.value)} />
-            </div>
-            <div>
-              <label>Description: </label>
-              <input
-                type="text"
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Price: </label>
-              <input
-                type="number"
-                onChange={(e) => setPrice(Number(e.target.value))}
-              />
-            </div>
-          </div>
-        )}
       </div>
+      {fileUrl && (
+        <div>
+          <div>
+            <label>NFT name: </label>
+            <input type="text" onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div>
+            <label>Description: </label>
+            <input
+              type="text"
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Price: </label>
+            <input type="string" onChange={(e) => setPrice(e.target.value)} />
+          </div>
+        </div>
+      )}
 
       <button onClick={() => createNFT(name, price, description, fileUrl)}>
         Upload NFT

@@ -7,6 +7,7 @@ import { MemoryDatastore } from 'datastore-core'
 import { createLibp2p } from 'libp2p'
 import { identifyService } from 'libp2p/identify'
 import { UnixFS, unixfs } from '@helia/unixfs'
+import { create as ipfsHttpClient } from 'ipfs-http-client'
 
 let helia
 let fs: UnixFS
@@ -23,34 +24,29 @@ export const uploadData = async (data: any) => {
   // we will use this TextEncoder to turn strings into Uint8Arrays
   const encoder = new TextEncoder()
 
-  const cid = await fs.addFile(data, {
+  // add the bytes to your node and receive a unique content identifier
+  const cid = await fs.addBytes(encoder.encode(data), {
     onProgress: (evt) => {
       console.info('add event', evt.type, evt.detail)
     },
   })
 
-  // add the bytes to your node and receive a unique content identifier
-  // const cid = await fs.addBytes(encoder.encode(data), {
-  //   onProgress: (evt) => {
-  //     console.info('add event', evt.type, evt.detail)
-  //   },
-  // })
-
   console.log('Added file:', cid.toString())
+  return cid.toString()
 
   // this decoder will turn Uint8Arrays into strings
-  // const decoder = new TextDecoder()
-  // let text = ''
+  const decoder = new TextDecoder()
+  let decodedFile: any
 
   for await (const chunk of fs.cat(cid, {
     onProgress: (evt) => {
       console.info('cat event', evt.type, evt.detail)
     },
   })) {
-    // text += decoder.decode(chunk, {
-    //   stream: true,
-    // })
+    decodedFile += decoder.decode(chunk, {
+      stream: true,
+    })
   }
 
-  // console.log('Added file contents:', text)
+  console.log('Added file contents:', decodedFile)
 }
