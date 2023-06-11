@@ -122,7 +122,7 @@ contract Marketplace is ERC721URIStorage {
     }
 
 
-    function fetchMarketItem() public view returns(MarketItem[] memory){
+    function fetchMarketItems() public view returns(MarketItem[] memory){
         uint256 itemCount = _tokenIds.current();
         uint256 unSoldItemCount = _tokenIds.current() - _itemsSold.current();
         uint256 currentIndex = 0;

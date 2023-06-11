@@ -37,6 +37,9 @@ export const Header = () => {
 
   return (
     <nav className="w-full h-40 flex items-center justify-between flex-wrap p-6 border-b border-dashed border-dark-secondary">
+      <Link href={{ pathname: '/' }}>
+        <button>Home</button>
+      </Link>
       <Link href={{ pathname: 'myaccount' }}>
         <button>My account</button>
       </Link>

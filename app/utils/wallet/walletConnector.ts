@@ -3,7 +3,7 @@ import Web3Modal from 'web3modal'
 import { Provider } from '@ethersproject/abstract-provider'
 import { marketPlaceABI, marketPlaceAddress } from './constants'
 
-const fetchContract = (signerOrProvider: Signer | Provider) =>
+export const fetchContract = (signerOrProvider: Signer | Provider) =>
   new ethers.Contract(marketPlaceAddress, marketPlaceABI, signerOrProvider)
 
 export const connectToSmartContract = async () => {
