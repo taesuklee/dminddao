@@ -17,7 +17,9 @@ export default function Home() {
   )
 
   useEffect(() => {
-    if (walletAddress) fetchNFTs(walletAddress)
+    if (walletAddress) {
+      fetchNFTs(walletAddress).then((items) => console.log('ITEMS', items))
+    }
   }, [walletAddress])
 
   return (

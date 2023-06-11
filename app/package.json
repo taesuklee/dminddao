@@ -19,6 +19,7 @@
     "@types/react": "18.2.9",
     "@types/react-dom": "18.2.4",
     "autoprefixer": "10.4.14",
+    "axios": "^1.4.0",
     "blockstore-core": "^4.2.0",
     "datastore-core": "^9.2.0",
     "eslint": "8.42.0",

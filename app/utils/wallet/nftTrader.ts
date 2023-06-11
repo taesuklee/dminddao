@@ -1,5 +1,7 @@
 import { ethers } from 'ethers'
 import { connectToSmartContract, fetchContract } from './walletConnector'
+import axios from 'axios'
+import { localServer } from './constants'
 
 export const createNFT = async (
   name: string,
@@ -28,57 +30,76 @@ export const createSale = async (url: string, price: string) => {
     const ethPrice = ethers.utils.parseUnits(price, 'ether')
     const contract = await connectToSmartContract()
 
-    console.log('CONTRACT', contract)
     const listingPrice = await contract?.getListingPrice()
-    console.log('LISTING price', listingPrice, price)
     const transaction = await contract?.createToken(url, price, {
       value: listingPrice.toString(),
     })
 
-    console.log('TRANSACTIONSSSS', transaction)
     await transaction.wait()
   } catch (error) {
     console.error(`Error while creating sale: ${error}`)
   }
 }
 
-export const fetchNFTs = async (currentAccount: string) => {
-  console.log('FETCH NFTs')
+export const fetchNFTs = async (
+  currentAccount: string,
+  onlyMine: boolean = false
+) => {
   try {
     if (currentAccount) {
       const provider = new ethers.providers.JsonRpcProvider()
-      const contract = fetchContract(provider)
 
-      const data = await contract.fetchMarketItems()
+      let contract: ethers.Contract | undefined
+      let data: any
+      if (!onlyMine) {
+        contract = fetchContract(provider)
+        data = await contract.fetchMarketItems()
+      } else {
+        contract = await connectToSmartContract()
+        data = await contract?.fetchMyNFTs()
+      }
+
       console.log('FETCH NFT', data)
+      const items = await Promise.all(
+        data.map(
+          async ({
+            tokenId,
+            seller,
+            owner,
+            price: unformattedPrice,
+          }: {
+            tokenId: any
+            seller: string
+            owner: string
+            price: any
+          }) => {
+            console.log('DATA map')
+            const tokenURI = await contract?.tokenURI(tokenId)
 
-      // const items = await Promise.all(
-      //   data.map(
-      //     async ({ tokenId, seller, owner, price: unformattedPrice }) => {
-      //       const tokenURI = await contract.tokenURI(tokenId)
+            console.log('tokenURI', tokenURI)
 
-      //       const {
-      //         data: { image, name, description },
-      //       } = await axios.get(tokenURI)
-      //       const price = ethers.utils.formatUnits(
-      //         unformattedPrice.toString(),
-      //         'ether'
-      //       )
+            //TODO axios 404
+            // const {
+            //   data: { image, name, description },
+            // } = await axios.get(tokenURI)
+            // const price = ethers.utils.formatUnits(
+            //   unformattedPrice.toString(),
+            //   'ether'
+            // )
 
-      //       return {
-      //         price,
-      //         tokenId: tokenId.toNumber(),
-      //         seller,
-      //         owner,
-      //         image,
-      //         name,
-      //         description,
-      //         tokenURI,
-      //       }
-      //     }
-      //   )
-      // )
-
+            // return {
+            //   price,
+            //   tokenId: tokenId.toNumber(),
+            //   seller,
+            //   owner,
+            //   image,
+            //   name,
+            //   description,
+            //   tokenURI,
+            // }
+          }
+        )
+      )
       // console.log(items)
       // return items
     }

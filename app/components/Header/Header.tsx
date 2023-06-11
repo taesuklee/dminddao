@@ -21,6 +21,15 @@ export const Header = () => {
     setAccount(walletAddress)
   }, [walletAddress])
 
+  useEffect(() => {
+    checkIfWalletConnected().then((accounts) => {
+      if (accounts && accounts[0]) {
+        dispatch(setAddress(accounts[0]))
+      }
+      console.log('WALLET CONNECTION CHECK')
+    })
+  }, [])
+
   const connectToWallet = async () => {
     if (!walletAddress) {
       await connectToSmartContract()
