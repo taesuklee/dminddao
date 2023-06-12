@@ -43,7 +43,13 @@ const page = () => {
                 <label>Seller:</label>
                 <h1>{nft.seller}</h1>
                 <button
-                  onClick={() => createSale(nft.tokenURI, nft.price, true)}>
+                  onClick={() =>
+                    createSale(
+                      nft.tokenId.toString(),
+                      nft.price.toString(),
+                      true
+                    )
+                  }>
                   Sell
                 </button>
               </div>

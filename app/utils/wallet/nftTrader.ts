@@ -26,21 +26,21 @@ export const createNFT = async (
 }
 
 export const createSale = async (
-  url: string,
+  ref: string,
   price: string,
   reselling: boolean
 ) => {
-  console.log('CREATE SALE')
+  console.log('CREATE SALE', ref, price)
   try {
     const ethPrice = ethers.utils.parseUnits(price, 'ether')
     const contract = await connectToSmartContract()
 
     const listingPrice = await contract?.getListingPrice()
     const transaction = !reselling
-      ? await contract?.createToken(url, ethPrice, {
+      ? await contract?.createToken(ref, ethPrice, {
           value: listingPrice.toString(),
         })
-      : await contract?.resellToken(url, ethPrice, {
+      : await contract?.resellToken(ref, ethPrice, {
           value: listingPrice.toString(),
         })
 
