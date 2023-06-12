@@ -60,6 +60,7 @@ export const fetchNFTs = async (
       }
 
       console.log('FETCH NFT', data)
+      return data
       const items = await Promise.all(
         data.map(
           async ({
@@ -105,5 +106,21 @@ export const fetchNFTs = async (
     }
   } catch (error) {
     console.error(`Error while fetching NFTS: ${error}.`)
+  }
+}
+
+export const buyNFT = async (nft: MarketItem) => {
+  try {
+    const contract = await connectToSmartContract()
+    const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
+    console.log(nft.price.toString(), price)
+
+    const transaction = await contract?.createMarketSale(nft.tokenId, {
+      value: nft.price,
+    })
+
+    await transaction.wait()
+  } catch (error) {
+    console.error(`Error while buying NFT: ${error}.`)
   }
 }

@@ -106,7 +106,7 @@ contract Marketplace is ERC721URIStorage {
     function createMarketSale(uint256 tokenId) public payable{
 
         uint256 price = idMarketItem[tokenId].price;
-
+        
         require(msg.value == price, "The price does not match.");
 
         idMarketItem[tokenId].owner = payable(msg.sender);

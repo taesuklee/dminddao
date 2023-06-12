@@ -1,16 +1,12 @@
 'use client'
 
-import { Header } from '@/components/Header/Header'
 import { useAppSelector } from '@/store/hooks'
-import { fetchNFTs } from '@/utils/wallet/nftTrader'
-import {
-  checkIfWalletConnected,
-  connectToSmartContract,
-} from '@/utils/wallet/walletConnector'
-import Image from 'next/image'
-import { useEffect } from 'react'
+import { buyNFT, fetchNFTs } from '@/utils/wallet/nftTrader'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
+  const [nfts, setNFTs] = useState<MarketItem[] | null>(null)
+
   const userName = useAppSelector((state) => state.authReducer.userName)
   const walletAddress = useAppSelector(
     (state) => state.marketplaceReducer.address
@@ -18,7 +14,10 @@ export default function Home() {
 
   useEffect(() => {
     if (walletAddress) {
-      fetchNFTs(walletAddress).then((items) => console.log('ITEMS', items))
+      fetchNFTs(walletAddress).then((items) => {
+        console.log('ITEMS', items)
+        if (items) setNFTs(items)
+      })
     }
   }, [walletAddress])
 
@@ -27,6 +26,16 @@ export default function Home() {
       <div>
         <h1>{userName}</h1>
         <h1>{walletAddress}</h1>
+        {nfts &&
+          nfts.map((nft, i) => (
+            <div key={i}>
+              <label>Owner:</label>
+              <h1>{nft.owner}</h1>
+              <label>Seller:</label>
+              <h1>{nft.seller}</h1>
+              <button onClick={() => buyNFT(nft)}>Buy</button>
+            </div>
+          ))}
       </div>
     </main>
   )
