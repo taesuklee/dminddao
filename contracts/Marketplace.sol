@@ -43,7 +43,7 @@ contract Marketplace is ERC721URIStorage {
     function updateListingPrice(uint256 _listingPrice) public payable {
         require(owner == msg.sender,
             "Only marketplace owner can update listing price.");
-            
+
         listingPrice = _listingPrice;
     }
 
@@ -107,7 +107,7 @@ contract Marketplace is ERC721URIStorage {
 
         idMarketItem[tokenId].owner = payable(msg.sender);
         idMarketItem[tokenId].sold = true;
-        idMarketItem[tokenId].owner = payable(address(0));
+        idMarketItem[tokenId].seller = payable(address(0));
 
         _itemsSold.increment();
 

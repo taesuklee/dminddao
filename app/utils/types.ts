@@ -3,6 +3,7 @@ export interface MarketItem {
   seller: string
   owner: string
   price: string
+  tokenURI: string
 }
 
 export enum NFTstate {

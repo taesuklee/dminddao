@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import AudioPlayer from '@/components/AudioPlayer/AudioPlayer'
 import Upload from '@/components/Upload/Upload'
 import { useAppSelector } from '@/store/hooks'
-import { fetchNFTs } from '@/utils/wallet/nftTrader'
+import { createSale, fetchNFTs } from '@/utils/wallet/nftTrader'
 import { MarketItem, NFTstate } from '@/utils/types'
 
 const page = () => {
@@ -18,12 +18,12 @@ const page = () => {
     if (walletAddress) {
       fetchNFTs(walletAddress, NFTstate.MINE).then((items) => {
         console.log('MINE', items)
-        setMyNFTs(items)
+        if (items) setMyNFTs(items)
       })
 
       fetchNFTs(walletAddress, NFTstate.LISTED).then((items) => {
         console.log('LISTED', items)
-        setListedItems(items)
+        if (items) setListedItems(items)
       })
     }
   }, [walletAddress])
@@ -42,6 +42,10 @@ const page = () => {
                 <h1>{nft.owner}</h1>
                 <label>Seller:</label>
                 <h1>{nft.seller}</h1>
+                <button
+                  onClick={() => createSale(nft.tokenURI, nft.price, true)}>
+                  Sell
+                </button>
               </div>
             ))}
           <h1>My listed NFTs</h1>

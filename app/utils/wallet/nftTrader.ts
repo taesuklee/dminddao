@@ -19,22 +19,30 @@ export const createNFT = async (
 
   try {
     // const added = await
-    await createSale(url, price)
+    await createSale(url, price, false)
   } catch (error) {
     console.error(`Error while creating NFT: ${error}`)
   }
 }
 
-export const createSale = async (url: string, price: string) => {
+export const createSale = async (
+  url: string,
+  price: string,
+  reselling: boolean
+) => {
   console.log('CREATE SALE')
   try {
     const ethPrice = ethers.utils.parseUnits(price, 'ether')
     const contract = await connectToSmartContract()
 
     const listingPrice = await contract?.getListingPrice()
-    const transaction = await contract?.createToken(url, price, {
-      value: listingPrice.toString(),
-    })
+    const transaction = !reselling
+      ? await contract?.createToken(url, ethPrice, {
+          value: listingPrice.toString(),
+        })
+      : await contract?.resellToken(url, ethPrice, {
+          value: listingPrice.toString(),
+        })
 
     await transaction.wait()
   } catch (error) {
@@ -45,7 +53,7 @@ export const createSale = async (url: string, price: string) => {
 export const fetchNFTs = async (
   currentAccount: string,
   nftState: NFTstate = NFTstate.ALL
-) => {
+): Promise<MarketItem[] | undefined> => {
   try {
     if (currentAccount) {
       const provider = new ethers.providers.JsonRpcProvider()
@@ -73,8 +81,6 @@ export const fetchNFTs = async (
           break
       }
 
-      console.log('FETCH NFT', data)
-      return data
       const items = await Promise.all(
         data.map(
           async ({
@@ -97,26 +103,26 @@ export const fetchNFTs = async (
             // const {
             //   data: { image, name, description },
             // } = await axios.get(tokenURI)
-            // const price = ethers.utils.formatUnits(
-            //   unformattedPrice.toString(),
-            //   'ether'
-            // )
+            const price = ethers.utils.formatUnits(
+              unformattedPrice.toString(),
+              'ether'
+            )
 
-            // return {
-            //   price,
-            //   tokenId: tokenId.toNumber(),
-            //   seller,
-            //   owner,
-            //   image,
-            //   name,
-            //   description,
-            //   tokenURI,
-            // }
+            return {
+              tokenId: tokenId.toNumber(),
+              seller,
+              owner,
+              price,
+              // image,
+              // name,
+              // description,
+              tokenURI,
+            }
           }
         )
       )
-      // console.log(items)
-      // return items
+
+      return items
     }
   } catch (error) {
     console.error(`Error while fetching NFTS: ${error}.`)
@@ -130,7 +136,7 @@ export const buyNFT = async (nft: MarketItem) => {
     console.log(nft.price.toString(), price)
 
     const transaction = await contract?.createMarketSale(nft.tokenId, {
-      value: nft.price,
+      value: price,
     })
 
     await transaction.wait()
