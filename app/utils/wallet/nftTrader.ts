@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { connectToSmartContract, fetchContract } from './walletConnector'
 import axios from 'axios'
 import { localServer } from './constants'
+import { MarketItem, NFTstate } from '../types'
 
 export const createNFT = async (
   name: string,
@@ -43,7 +44,7 @@ export const createSale = async (url: string, price: string) => {
 
 export const fetchNFTs = async (
   currentAccount: string,
-  onlyMine: boolean = false
+  nftState: NFTstate = NFTstate.ALL
 ) => {
   try {
     if (currentAccount) {
@@ -51,12 +52,25 @@ export const fetchNFTs = async (
 
       let contract: ethers.Contract | undefined
       let data: any
-      if (!onlyMine) {
-        contract = fetchContract(provider)
-        data = await contract.fetchMarketItems()
-      } else {
-        contract = await connectToSmartContract()
-        data = await contract?.fetchMyNFTs()
+      switch (nftState) {
+        case NFTstate.ALL:
+          contract = fetchContract(provider)
+          data = await contract.fetchMarketItems()
+          break
+
+        case NFTstate.LISTED:
+          contract = await connectToSmartContract()
+          data = await contract?.fetchItemsListed()
+          break
+
+        case NFTstate.MINE:
+          contract = await connectToSmartContract()
+          data = await contract?.fetchMyNFTs()
+          break
+
+        default:
+          throw new Error(`Unknown NFT state: ${nftState}`)
+          break
       }
 
       console.log('FETCH NFT', data)

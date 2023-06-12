@@ -36,18 +36,14 @@ contract Marketplace is ERC721URIStorage {
         bool sold
     );
 
-    modifier onlyOwner () {
-        require(msg.sender == owner,
-        "Only marketplace owner can change the listing price"
-        );
-        _;
-    }
-
     constructor() ERC721("DMindDAO Token", "DMindNFT"){
-        owner == payable(msg.sender);
+        owner = payable(msg.sender);
     }
 
-    function updateListingPrice(uint256 _listingPrice) public payable onlyOwner {
+    function updateListingPrice(uint256 _listingPrice) public payable {
+        require(owner == msg.sender,
+            "Only marketplace owner can update listing price.");
+            
         listingPrice = _listingPrice;
     }
 
@@ -106,7 +102,7 @@ contract Marketplace is ERC721URIStorage {
     function createMarketSale(uint256 tokenId) public payable{
 
         uint256 price = idMarketItem[tokenId].price;
-        
+
         require(msg.value == price, "The price does not match.");
 
         idMarketItem[tokenId].owner = payable(msg.sender);

@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppSelector } from '@/store/hooks'
+import { MarketItem } from '@/utils/types'
 import { buyNFT, fetchNFTs } from '@/utils/wallet/nftTrader'
 import { useEffect, useState } from 'react'
 
@@ -15,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     if (walletAddress) {
       fetchNFTs(walletAddress).then((items) => {
-        console.log('ITEMS', items)
+        console.log('ALL', items)
         if (items) setNFTs(items)
       })
     }
