@@ -6,14 +6,19 @@ import Upload from '@/components/Upload/Upload'
 import { useAppSelector } from '@/store/hooks'
 import { createSale, fetchNFTs } from '@/utils/wallet/nftTrader'
 import { MarketItem, NFTstate } from '@/utils/types'
+import { useRouter } from 'next/navigation'
 
 const page = () => {
   const [myNFTs, setMyNFTs] = useState<null | MarketItem[]>(null)
   const [listedItems, setListedItems] = useState<null | MarketItem[]>(null)
+  const [sellingPrice, setSellingPrice] = useState('')
+
+  const router = useRouter()
 
   const walletAddress = useAppSelector(
     (state) => state.marketplaceReducer.address
   )
+
   useEffect(() => {
     if (walletAddress) {
       fetchNFTs(walletAddress, NFTstate.MINE).then((items) => {
@@ -42,14 +47,16 @@ const page = () => {
                 <h1>{nft.owner}</h1>
                 <label>Seller:</label>
                 <h1>{nft.seller}</h1>
+                <label>Price: </label>
+                <input
+                  type="string"
+                  onChange={(e) => setSellingPrice(e.target.value)}
+                />
                 <button
-                  onClick={() =>
-                    createSale(
-                      nft.tokenId.toString(),
-                      nft.price.toString(),
-                      true
-                    )
-                  }>
+                  onClick={async () => {
+                    await createSale(nft.tokenId.toString(), sellingPrice, true)
+                    router.push('/')
+                  }}>
                   Sell
                 </button>
               </div>

@@ -3,15 +3,8 @@ import React, { useCallback, useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { FiUpload } from 'react-icons/fi'
 import { createNFT } from '@/utils/wallet/nftTrader'
-
-import { createHelia } from 'helia'
-import type { Libp2p } from '@libp2p/interface-libp2p'
-import type { PubSub } from '@libp2p/interface-pubsub'
-import type { DualKadDHT } from '@libp2p/kad-dht'
-import type { Helia } from '@helia/interface'
-import { UnixFS, unixfs } from '@helia/unixfs'
 import { createNode, uploadData } from '@/utils/ipfs/ipfs'
-import { MemoryBlockstore } from 'blockstore-core'
+import { useRouter } from 'next/navigation'
 
 const Upload = () => {
   const [fileUrl, setFileUrl] = useState('')
@@ -26,6 +19,8 @@ const Upload = () => {
 
     init()
   }, [fileUrl])
+
+  const router = useRouter()
 
   const onDrop = useCallback(
     async (acceptedFile: any[]) => {
@@ -72,7 +67,13 @@ const Upload = () => {
         </div>
       )}
 
-      <button onClick={() => createNFT(name, price, description, fileUrl)}>
+      <button
+        onClick={async () => {
+          if (name && price && description && fileUrl) {
+            await createNFT(name, price, description, fileUrl)
+            router.push('/')
+          }
+        }}>
         Upload NFT
       </button>
     </div>

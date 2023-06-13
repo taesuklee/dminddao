@@ -3,10 +3,12 @@
 import { useAppSelector } from '@/store/hooks'
 import { MarketItem } from '@/utils/types'
 import { buyNFT, fetchNFTs } from '@/utils/wallet/nftTrader'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
   const [nfts, setNFTs] = useState<MarketItem[] | null>(null)
+  const router = useRouter()
 
   const userName = useAppSelector((state) => state.authReducer.userName)
   const walletAddress = useAppSelector(
@@ -34,7 +36,13 @@ export default function Home() {
               <h1>{nft.owner}</h1>
               <label>Seller:</label>
               <h1>{nft.seller}</h1>
-              <button onClick={() => buyNFT(nft)}>Buy</button>
+              <button
+                onClick={async () => {
+                  await buyNFT(nft)
+                  router.push('/myaccount')
+                }}>
+                Buy
+              </button>
             </div>
           ))}
       </div>
