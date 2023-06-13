@@ -1,5 +1,4 @@
-import marketPlace from './Marketplace.json'
+import marketPlace from "./Marketplace.json"
 
-export const marketPlaceAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+export const marketPlaceAddress = "0xd8becb9f82e84b03a37958a84d2fb7310134b720"
 export const marketPlaceABI = marketPlace.abi
-export const localServer = 'http://127.0.0.1:8545/'
