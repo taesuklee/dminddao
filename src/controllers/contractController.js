@@ -20,12 +20,4 @@ router.get("/all", async (req, res) => {
     }
 })
 
-router.get("/listed", async (req, res) => {
-    try {
-    } catch (error) {
-        console.log("While fetching listed contract:", error)
-        res.status(500)
-    }
-})
-
 module.exports = router

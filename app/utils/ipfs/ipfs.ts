@@ -1,52 +1,36 @@
-import { createHelia } from 'helia'
-import { noise } from '@chainsafe/libp2p-noise'
-import { yamux } from '@chainsafe/libp2p-yamux'
-import { bootstrap } from '@libp2p/bootstrap'
-import { MemoryBlockstore } from 'blockstore-core'
-import { MemoryDatastore } from 'datastore-core'
-import { createLibp2p } from 'libp2p'
-import { identifyService } from 'libp2p/identify'
-import { UnixFS, unixfs } from '@helia/unixfs'
-import { create as ipfsHttpClient } from 'ipfs-http-client'
+import lighthouse from "@lighthouse-web3/sdk"
+import { createHelia } from "helia"
+import { noise } from "@chainsafe/libp2p-noise"
+import { yamux } from "@chainsafe/libp2p-yamux"
+import { bootstrap } from "@libp2p/bootstrap"
+import { MemoryBlockstore } from "blockstore-core"
+import { MemoryDatastore } from "datastore-core"
+import { createLibp2p } from "libp2p"
+import { identifyService } from "libp2p/identify"
+import { UnixFS, unixfs } from "@helia/unixfs"
+import { create as ipfsHttpClient } from "ipfs-http-client"
 
 let helia
 let fs: UnixFS
 
 export async function createNode() {
-  const blockstore = new MemoryBlockstore()
-  const datastore = new MemoryDatastore()
+    const blockstore = new MemoryBlockstore()
+    const datastore = new MemoryDatastore()
 
-  helia = await createHelia({ blockstore, datastore })
-  fs = unixfs(helia)
+    helia = await createHelia({ blockstore, datastore })
+    fs = unixfs(helia)
 }
 
-export const uploadData = async (data: any) => {
-  // we will use this TextEncoder to turn strings into Uint8Arrays
-  const encoder = new TextEncoder()
+export const uploadData = async (file: FileList | null) => {
+    const output = await lighthouse.upload(
+        file,
+        process.env.NEXT_PUBLIC_LIGHTHOUSE_API_KEY!,
+        (progress) => console.log(100 - progress?.total / progress?.uploaded)
+    )
 
-  // add the bytes to your node and receive a unique content identifier
-  const cid = await fs.addBytes(encoder.encode(data), {
-    onProgress: (evt) => {
-      console.info('add event', evt.type, evt.detail)
-    },
-  })
-
-  console.log('Added file:', cid.toString())
-  return cid.toString()
-
-  // this decoder will turn Uint8Arrays into strings
-  const decoder = new TextDecoder()
-  let decodedFile: any
-
-  for await (const chunk of fs.cat(cid, {
-    onProgress: (evt) => {
-      console.info('cat event', evt.type, evt.detail)
-    },
-  })) {
-    decodedFile += decoder.decode(chunk, {
-      stream: true,
-    })
-  }
-
-  console.log('Added file contents:', decodedFile)
+    console.log(
+        "Upload status: ",
+        output,
+        "Visit at https://gateway.lighthouse.storage/ipfs/" + output.data.Hash
+    )
 }
