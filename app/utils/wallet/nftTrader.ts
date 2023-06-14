@@ -1,6 +1,7 @@
 import { ethers } from "ethers"
 import { connectToSmartContract, fetchContract } from "./walletConnector"
 import { MarketItem, NFTstate } from "../types"
+import axios from "axios"
 
 export const createNFT = async (name: string, price: string, description: string, url: string) => {
     console.log("CREATE NFT")
@@ -45,74 +46,56 @@ export const fetchNFTs = async (
 ): Promise<MarketItem[] | undefined> => {
     try {
         if (currentAccount) {
-            const provider = new ethers.providers.JsonRpcProvider()
+            const contract = await connectToSmartContract()
 
-            let contract: ethers.Contract | undefined
-            let data: any
             switch (nftState) {
                 case NFTstate.ALL:
-                    contract = fetchContract(provider)
-                    data = await contract.fetchMarketItems()
+                    let {
+                        data: { items },
+                    } = await axios.get("http://localhost:9000/contract/all")
+
+                    return items
                     break
 
                 case NFTstate.LISTED:
-                    contract = await connectToSmartContract()
-                    data = await contract?.fetchItemsListed()
+                    const listedItems = await contract?.fetchItemsListed()
+                    return await normalizeItems(listedItems, contract)
                     break
 
                 case NFTstate.MINE:
-                    contract = await connectToSmartContract()
-                    data = await contract?.fetchMyNFTs()
+                    const myNFTs = await contract?.fetchMyNFTs()
+                    return await normalizeItems(myNFTs, contract)
                     break
 
                 default:
                     throw new Error(`Unknown NFT state: ${nftState}`)
                     break
             }
-
-            const items = await Promise.all(
-                data.map(
-                    async ({
-                        tokenId,
-                        seller,
-                        owner,
-                        price: unformattedPrice,
-                    }: {
-                        tokenId: any
-                        seller: string
-                        owner: string
-                        price: any
-                    }) => {
-                        console.log("DATA map")
-                        const tokenURI = await contract?.tokenURI(tokenId)
-
-                        console.log("tokenURI", tokenURI)
-
-                        //TODO axios 404
-                        // const {
-                        //   data: { image, name, description },
-                        // } = await axios.get(tokenURI)
-                        const price = ethers.utils.formatUnits(unformattedPrice.toString(), "ether")
-
-                        return {
-                            tokenId: tokenId.toNumber(),
-                            seller,
-                            owner,
-                            price,
-                            // image,
-                            // name,
-                            // description,
-                            tokenURI,
-                        }
-                    }
-                )
-            )
-
-            return items
         }
     } catch (error) {
         console.error(`Error while fetching NFTS: ${error}.`)
     }
+}
+
+const normalizeItems = async (data: any[], contract: ethers.Contract | undefined) => {
+    return await Promise.all(
+        data.map(async ({ tokenId, seller, owner, price: unformattedPrice }) => {
+            const tokenURI = await contract?.tokenURI(tokenId)
+
+            const price = ethers.utils.formatUnits(unformattedPrice.toString(), "ether")
+
+            return {
+                tokenId: tokenId.toNumber(),
+                seller,
+                owner,
+                price,
+                // image,
+                // name,
+                // description,
+                tokenURI,
+            }
+        })
+    )
 }
 
 export const buyNFT = async (nft: MarketItem) => {
