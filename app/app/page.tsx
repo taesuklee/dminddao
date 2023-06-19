@@ -39,9 +39,11 @@ export default function Home() {
                     />
                 </audio>
                 <button
-                    onClick={async () => await axios("http://localhost:9000/bacalhau/?prompt=test")}
+                    onClick={async () =>
+                        await axios("http://localhost:9000/bacalhau/?prompt=translate")
+                    }
                 >
-                    Trigger
+                    Translate
                 </button>
                 {nfts &&
                     nfts.map((nft, i) => (

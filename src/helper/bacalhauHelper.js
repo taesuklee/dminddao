@@ -11,7 +11,7 @@ exports.extract = (pattern, text) => {
         if (m.index === regex.lastIndex) {
             regex.lastIndex++
         }
-        console.log(`${m[0]}`)
+        console.log(`m: ${m[0]}`)
         return m[0]
     }
 }

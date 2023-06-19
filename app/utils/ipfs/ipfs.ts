@@ -1,14 +1,8 @@
 import lighthouse from "@lighthouse-web3/sdk"
 import { createHelia } from "helia"
-import { noise } from "@chainsafe/libp2p-noise"
-import { yamux } from "@chainsafe/libp2p-yamux"
-import { bootstrap } from "@libp2p/bootstrap"
 import { MemoryBlockstore } from "blockstore-core"
 import { MemoryDatastore } from "datastore-core"
-import { createLibp2p } from "libp2p"
-import { identifyService } from "libp2p/identify"
 import { UnixFS, unixfs } from "@helia/unixfs"
-import { create as ipfsHttpClient } from "ipfs-http-client"
 
 let helia
 let fs: UnixFS

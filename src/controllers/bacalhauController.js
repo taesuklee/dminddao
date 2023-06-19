@@ -7,11 +7,8 @@ const router = Router()
 router.get("/", async (req, res) => {
     try {
         const prompt = req.query.prompt || undefined
-
         console.log("PROMPT", prompt)
-
         if (prompt !== undefined) {
-            console.log(`prompt : ${prompt}`)
             // const submitSDJob = `bacalhau docker run --gpu 1 ghcr.io/bacalhau-project/examples/stable-diffusion-gpu:0.0.1 -- python main.py --o ./outputs --p "${prompt}" --n 35`
             const submitSDJob =
                 "bacalhau docker run \
@@ -20,26 +17,32 @@ router.get("/", async (req, res) => {
                 --timeout 3600 \
                 --wait-timeout-secs 3600 \
                 jsacex/whisper \
-                -i ipfs://bafybeielf6z4cd2nuey5arckect5bjmelhouvn5rhbjlvpvhp7erkrc4nu \
-                -- python openai-whisper.py -p inputs/Apollo_11_moonwalk_montage_720p.mp4 -o outputs"
+                -i ipfs://QmQedij4LtCECi2j4fSS5sw88gg3QSMsnm8sSg3N1ANDFi \
+                -- python openai-whisper.py -p inputs/koreantest.mp4 -s translate -o outputs"
             const data = []
-            var obj = new Object()
+            let obj = new Object()
 
-            const jobId = extract(fetchJobId, shell.exec(submitSDJob).stdout)
+            let submitResult = shell.exec(submitSDJob)
+            console.log("EXERESULT:", submitResult.stdout)
+            const jobId = extract(fetchJobId, submitResult)
+            console.log("JOB ID: ", jobId)
             const cid = extract(fetchCID, shell.exec(`bacalhau describe ${jobId}`).stdout)
             console.log(`CID : ${cid}`)
-            const url = `https://ipfs.io/ipfs/${cid}/outputs/Apollo_11_moonwalk_montage_720p.vtt`
+            const url = `https://ipfs.io/ipfs/${cid}/outputs/koreantest.vtt`
 
             obj.jobID = jobId
             obj.CID = cid
             obj.url = url
             data.push(obj)
-            console.log(data)
+            console.log("DATA:", data)
             return data
         } else {
             return "prompt undefined"
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log("While running bacalhau job:", error)
+        res.status(500)
+    }
 })
 
 module.exports = router
